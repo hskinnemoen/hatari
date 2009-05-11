@@ -46,7 +46,7 @@ const char Opt_rcsid[] = "Hatari $Id: options.c,v 1.72 2008-09-20 12:01:08 thoth
 
 bool bLoadAutoSave;        /* Load autosave memory snapshot at startup */
 bool bLoadMemorySave;      /* Load memory snapshot provided via option at startup */
-bool bBiosIntercept;       /* whether UAE should intercept Bios & XBios calls */
+bool bBiosIntercept=TRUE;  /* whether UAE should intercept Bios & XBios calls */
 
 
 /*  List of supported options. */
