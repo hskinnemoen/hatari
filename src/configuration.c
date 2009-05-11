@@ -528,21 +528,11 @@ void Configuration_Apply(bool bReset)
 	Audio_SetOutputAudioFreq(ConfigureParams.Sound.nPlaybackFreq);
 
 	/* CPU settings */
-	if (ConfigureParams.System.nCpuFreq < 12)
-	{
-		ConfigureParams.System.nCpuFreq = 8;
+	nCpuFreqShift = log2(ConfigureParams.System.nCpuFreq) - 3;
+	if(nCpuFreqShift < 0 || nCpuFreqShift > 6)
 		nCpuFreqShift = 0;
-	}
-	else if (ConfigureParams.System.nCpuFreq > 26)
-	{
-		ConfigureParams.System.nCpuFreq = 32;
-		nCpuFreqShift = 2;
-	}
-	else
-	{
-		ConfigureParams.System.nCpuFreq = 16;
-		nCpuFreqShift = 1;
-	}
+	ConfigureParams.System.nCpuFreq = 8 << nCpuFreqShift;
+
 	/* Change UAE cpu_level and cpu_compatible accordingly */
 	M68000_CheckCpuLevel();
 

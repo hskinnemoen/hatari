@@ -177,6 +177,10 @@ static inline void M68000_AddCycles(int cycles)
 	cycles = (cycles + 3) & ~3;
 	cycles = cycles >> nCpuFreqShift;
 
+	/* we have to advance the cycle counter by at least one cycle! */
+	if (cycles < 1)
+		cycles = 1;
+
 	PendingInterruptCount -= INT_CONVERT_TO_INTERNAL(cycles, INT_CPU_CYCLE);
 	nCyclesMainCounter += cycles;
 }
@@ -231,6 +235,10 @@ static inline void M68000_AddCyclesWithPairing(int cycles)
 		cycles = (cycles + 3) & ~3;	 /* no pairing, round current instr to 4 cycles */
 
 	cycles = cycles >> nCpuFreqShift;
+
+	/* we have to advance the cycle counter by at least one cycle! */
+	if (cycles < 1)
+		cycles = 1;
 
 	PendingInterruptCount -= INT_CONVERT_TO_INTERNAL ( cycles , INT_CPU_CYCLE );
 
