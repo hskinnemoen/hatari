@@ -24,12 +24,13 @@ const char DlgSystem_rcsid[] = "Hatari $Id: dlgSystem.c,v 1.11 2008-06-08 16:07:
 #define DLGSYS_8MHZ     17
 #define DLGSYS_16MHZ    18
 #define DLGSYS_32MHZ    19
-#define DLGSYS_PREFETCH 20
-#define DLGSYS_BLITTER  21
-#define DLGSYS_RTC      22
-#define DLGSYS_TIMERD   23
-#define DLGSYS_SLOWFDC  24
-
+#define DLGSYS_64MHZ    20
+#define DLGSYS_128MHZ   21
+#define DLGSYS_PREFETCH 22
+#define DLGSYS_BLITTER  23
+#define DLGSYS_RTC      24
+#define DLGSYS_TIMERD   25
+#define DLGSYS_SLOWFDC  26
 
 /* The "System" dialog: */
 static SGOBJ systemdlg[] =
@@ -57,6 +58,8 @@ static SGOBJ systemdlg[] =
 	{ SGRADIOBUT, 0, 0, 19,13, 3,1, "8" },
 	{ SGRADIOBUT, 0, 0, 24,13, 4,1, "16" },
 	{ SGRADIOBUT, 0, 0, 30,13, 4,1, "32" },
+	{ SGRADIOBUT, 0, 0, 19,14, 4,1, "64" },
+	{ SGRADIOBUT, 0, 0, 30,14, 4,1, "128" },
 
 	{ SGCHECKBOX, 0, 0, 2,15, 32,1, "Slower but more compatible CPU" },
 	{ SGCHECKBOX, 0, 0, 2,16, 20,1, "Blitter emulation" },
@@ -93,16 +96,20 @@ void Dialog_SystemDlg(void)
 	}
 	systemdlg[DLGSYS_ST + ConfigureParams.System.nMachineType].state |= SG_SELECTED;
 
-	for (i = DLGSYS_8MHZ; i <= DLGSYS_16MHZ; i++)
+	for (i = DLGSYS_8MHZ; i <= DLGSYS_128MHZ; i++)
 	{
 		systemdlg[i].state &= ~SG_SELECTED;
 	}
-	if (ConfigureParams.System.nCpuFreq == 32)
-	  systemdlg[DLGSYS_32MHZ].state |= SG_SELECTED;
+	if (ConfigureParams.System.nCpuFreq == 128)
+		systemdlg[DLGSYS_128MHZ].state |= SG_SELECTED;
+	else if (ConfigureParams.System.nCpuFreq == 64)
+		systemdlg[DLGSYS_64MHZ].state |= SG_SELECTED;
+	else if (ConfigureParams.System.nCpuFreq == 32)
+		systemdlg[DLGSYS_32MHZ].state |= SG_SELECTED;
 	else if (ConfigureParams.System.nCpuFreq == 16)
-	  systemdlg[DLGSYS_16MHZ].state |= SG_SELECTED;
+		systemdlg[DLGSYS_16MHZ].state |= SG_SELECTED;
 	else
-	  systemdlg[DLGSYS_8MHZ].state |= SG_SELECTED;
+		systemdlg[DLGSYS_8MHZ].state |= SG_SELECTED;
 
 	if (ConfigureParams.System.bCompatibleCpu)
 		systemdlg[DLGSYS_PREFETCH].state |= SG_SELECTED;
@@ -152,7 +159,11 @@ void Dialog_SystemDlg(void)
 		}
 	}
 
-	if (systemdlg[DLGSYS_32MHZ].state & SG_SELECTED)
+	if (systemdlg[DLGSYS_128MHZ].state & SG_SELECTED)
+		ConfigureParams.System.nCpuFreq = 128;
+	else if (systemdlg[DLGSYS_64MHZ].state & SG_SELECTED)
+		ConfigureParams.System.nCpuFreq = 64;
+	else if (systemdlg[DLGSYS_32MHZ].state & SG_SELECTED)
 		ConfigureParams.System.nCpuFreq = 32;
 	else if (systemdlg[DLGSYS_16MHZ].state & SG_SELECTED)
 		ConfigureParams.System.nCpuFreq = 16;
