@@ -1664,6 +1664,9 @@ static void m68k_run_1 (void)
 	int cycles;
 	uae_u32 opcode = get_iword_prefetch (0);
 
+	if (bDebugStep)
+	    DebugUI();
+
 #ifdef DEBUG_PREFETCH
 	if (get_ilong (0) != do_get_mem_long (&regs.prefetch)) {
 	    fprintf (stderr, "Prefetch differs from memory.\n");
@@ -1756,6 +1759,9 @@ static void m68k_run_2 (void)
     for (;;) {
 	int cycles;
 	uae_u32 opcode = get_iword (0);
+
+	if (bDebugStep)
+	    DebugUI();
 
 	/*m68k_dumpstate(stderr, NULL);*/
 	if ( HATARI_TRACE_LEVEL ( HATARI_TRACE_CPU_DISASM ) )

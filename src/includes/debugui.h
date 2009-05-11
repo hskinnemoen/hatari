@@ -11,10 +11,13 @@
 /* DebugUI_ParseCommand() return values */
 enum {
 	DEBUG_QUIT,
-	DEBUG_CMD
+	DEBUG_CMD,
+	DEBUG_STEP
 };
 
 extern void DebugUI(void);
 extern int DebugUI_ParseCommand(char *input);
+
+extern bool bDebugStep;
 
 #endif /* HATARI_DEBUGUI_H */

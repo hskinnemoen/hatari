@@ -39,6 +39,8 @@ const char DebugUI_rcsid[] = "Hatari $Id: debugui.c,v 1.26 2008-10-25 22:32:15 e
 #define NON_PRINT_CHAR '.'     /* character to display for non-printables */
 #define DISASM_INSTS   5       /* disasm - number of instructions */
 
+bool bDebugStep;		/* Are we single stepping the CPU? */
+
 static bool bMemDump;          /* has memdump been called? */
 static unsigned long memdump_addr; /* memdump address */
 static unsigned long disasm_addr;  /* disasm address */
@@ -570,6 +572,7 @@ static void DebugUI_Help(void)
 	        " l filename address - load a file into memory starting at address. \n"
 	        " s filename address length - dump length bytes from memory to a file. \n"
 	        " o [command line] - set Hatari command line options\n\n"
+		" i - step one instruction\n"
 	        " q - quit emulator\n"
 	        " c - continue emulation\n\n"
 	        " Adresses may be given as a range e.g. fc0000-fc0100\nAll values in hexadecimal.\n"
@@ -684,6 +687,11 @@ int DebugUI_ParseCommand(char *input)
 			DebugUI_SaveBin(input);
 		break;
 
+	case 'i':
+		//DebugUI_Step();
+		retval = DEBUG_STEP;
+		break;
+
 	 default:
 		if (command[0])
 			fprintf(stderr,"  Unknown command: '%s'\n", command);
@@ -722,20 +730,38 @@ static int DebugUI_GetCommand(void)
 	return retval;
 }
 
-
 /*-----------------------------------------------------------------------*/
 /**
  * Debug UI
  */
 void DebugUI(void)
 {
+	int cmd;
 	bMemDump = FALSE;
 	disasm_addr = 0;
 
-	fprintf(stderr, "\nYou have entered debug mode. Type c to continue emulation, h for help."
+	if (bDebugStep)
+	{
+		uaecptr disasm_addr = M68000_GetPC();
+		uaecptr nextpc;
+		m68k_disasm(debugOutput, (uaecptr)disasm_addr, &nextpc, 1);
+	}
+	else
+	{
+		fprintf(stderr, "\nYou have entered debug mode. Type c to continue emulation, h for help."
 	                "\n----------------------------------------------------------------------\n");
-	while (DebugUI_GetCommand() != DEBUG_QUIT)
-		;
+	}
+
+	while ( (cmd=DebugUI_GetCommand()) != DEBUG_QUIT)
+	{
+		if(cmd == DEBUG_STEP)
+		{
+			fprintf(stderr,"Stepping...\n");
+			bDebugStep = TRUE;
+			return;
+		}
+	}
+	bDebugStep = FALSE;
 	fprintf(stderr,"Returning to emulation...\n------------------------------\n\n");
 	DebugUI_SetLogDefault();
 }
